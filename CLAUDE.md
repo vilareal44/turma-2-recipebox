@@ -75,3 +75,8 @@ web/src/
 ### Ambiente
 
 Requer `DATABASE_URL` em `web/.env.local` apontando para uma instância Neon PostgreSQL. Exemplo em `web/.env.example`.
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
