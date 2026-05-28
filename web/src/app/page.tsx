@@ -1,5 +1,5 @@
-import { NotesClient } from './notes-client';
+import { RecipesClient } from './recipes-client';
 
 export default function HomePage() {
-  return <NotesClient />;
+  return <RecipesClient />;
 }

@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Notes App",
-  description: "Bootstrapped full-stack app",
+  title: "RecipeBox",
+  description: "Sua coleção pessoal de receitas",
 };
 
 export default function RootLayout({
@@ -32,7 +32,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <Header />
-          <main className="mx-auto max-w-4xl w-full px-4 py-8 sm:px-6">{children}</main>
+          <main className="mx-auto max-w-6xl w-full px-4 py-8 sm:px-6">{children}</main>
         </Providers>
       </body>
     </html>
