@@ -15,7 +15,9 @@ export const createRecipeSchema = z.object({
   imageUrl: z.string().url().optional().or(z.literal('')),
 });
 
-export const updateRecipeSchema = createRecipeSchema.partial();
+export const updateRecipeSchema = createRecipeSchema.partial().extend({
+  isFavorite: z.boolean().optional(),
+});
 
 export type CreateRecipeInput = z.infer<typeof createRecipeSchema>;
 export type UpdateRecipeInput = z.infer<typeof updateRecipeSchema>;

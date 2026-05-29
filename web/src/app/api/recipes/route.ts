@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { recipes } from '@/db/schema';
 import { createRecipeSchema } from '@/lib/validators';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, and } from 'drizzle-orm';
 import type { Recipe } from '@/db/schema';
 
 function parseRecipe(row: typeof recipes.$inferSelect): Recipe {
@@ -15,10 +15,19 @@ function parseRecipe(row: typeof recipes.$inferSelect): Recipe {
 
 export async function GET(request: NextRequest) {
   const category = request.nextUrl.searchParams.get('category') ?? undefined;
-  const query = db.select().from(recipes).orderBy(desc(recipes.createdAt));
-  const rows = category
-    ? await db.select().from(recipes).where(eq(recipes.category, category)).orderBy(desc(recipes.createdAt))
-    : await query;
+  const favorites = request.nextUrl.searchParams.get('favorites') === 'true';
+
+  const conditions = [];
+  if (category) conditions.push(eq(recipes.category, category));
+  if (favorites) conditions.push(eq(recipes.isFavorite, true));
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+  const rows = await db
+    .select()
+    .from(recipes)
+    .where(whereClause)
+    .orderBy(desc(recipes.createdAt));
+
   return NextResponse.json(rows.map(parseRecipe));
 }
 

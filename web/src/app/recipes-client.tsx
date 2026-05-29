@@ -7,7 +7,8 @@ import { CATEGORIES } from '@/lib/validators';
 
 export function RecipesClient() {
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
-  const { data: recipes, isLoading } = useRecipes(selectedCategory);
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
+  const { data: recipes, isLoading } = useRecipes(selectedCategory, onlyFavorites);
 
   return (
     <div className="space-y-6">
@@ -30,6 +31,15 @@ export function RecipesClient() {
             {cat}
           </Button>
         ))}
+        <div className="ml-auto">
+          <Button
+            variant={onlyFavorites ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setOnlyFavorites(!onlyFavorites)}
+          >
+            ❤️ Favoritas
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -40,9 +50,11 @@ export function RecipesClient() {
         </div>
       ) : !recipes?.length ? (
         <p className="text-muted-foreground py-8 text-center">
-          {selectedCategory
-            ? `No recipes found for "${selectedCategory}".`
-            : 'No recipes yet. Add your first recipe!'}
+          {onlyFavorites
+            ? 'Nenhuma receita favoritada ainda.'
+            : selectedCategory
+              ? `No recipes found for "${selectedCategory}".`
+              : 'No recipes yet. Add your first recipe!'}
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

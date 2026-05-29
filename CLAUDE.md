@@ -79,4 +79,5 @@ Requer `DATABASE_URL` em `web/.env.local` apontando para uma instância Neon Pos
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
+at `specs/001-favorite-recipe/plan.md`.
 <!-- SPECKIT END -->

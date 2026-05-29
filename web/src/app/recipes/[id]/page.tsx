@@ -1,9 +1,9 @@
 'use client';
-import { use, useState } from 'react';
+import { use, useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { Clock, Users, Pencil, Trash2, ChevronLeft } from 'lucide-react';
+import { Clock, Users, Pencil, Trash2, ChevronLeft, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { useRecipe, useDeleteRecipe } from '@/hooks/use-recipes';
+import { useRecipe, useDeleteRecipe, useToggleFavorite } from '@/hooks/use-recipes';
 
 export default function RecipeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -27,6 +27,26 @@ export default function RecipeDetailPage({ params }: { params: Promise<{ id: str
   const { data: recipe, isLoading } = useRecipe(recipeId);
   const deleteRecipe = useDeleteRecipe();
   const [open, setOpen] = useState(false);
+  const [optimisticFavorite, setOptimisticFavorite] = useState<boolean | null>(null);
+  const isFavorite = optimisticFavorite ?? recipe?.isFavorite ?? false;
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const toggleMutation = useToggleFavorite(recipeId, isFavorite);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
+  const handleToggleFavorite = () => {
+    setOptimisticFavorite(!isFavorite);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      toggleMutation.mutate(undefined, {
+        onSettled: () => setOptimisticFavorite(null),
+      });
+    }, 300);
+  };
 
   function handleDelete() {
     deleteRecipe.mutate(recipeId, {
@@ -66,7 +86,21 @@ export default function RecipeDetailPage({ params }: { params: Promise<{ id: str
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-4">
           <h1 className="text-3xl font-bold">{recipe.title}</h1>
-          <Badge variant="secondary" className="capitalize shrink-0 text-sm">{recipe.category}</Badge>
+          <div className="flex items-center gap-2 shrink-0">
+            <Badge variant="secondary" className="capitalize text-sm">{recipe.category}</Badge>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleToggleFavorite}
+              className="h-10 w-10 rounded-full"
+            >
+              <Heart
+                className="h-5 w-5"
+                fill={isFavorite ? 'currentColor' : 'none'}
+                color={isFavorite ? '#ef4444' : 'currentColor'}
+              />
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center gap-6 text-sm text-muted-foreground">

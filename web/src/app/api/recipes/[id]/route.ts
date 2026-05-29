@@ -28,11 +28,12 @@ export async function PUT(request: NextRequest, { params }: Params) {
   if (!parsed.success) {
     return NextResponse.json({ errors: parsed.error.flatten().fieldErrors }, { status: 400 });
   }
-  const { imageUrl, ingredients, instructions, ...rest } = parsed.data;
+  const { imageUrl, ingredients, instructions, isFavorite, ...rest } = parsed.data;
   const updateData: Record<string, unknown> = { ...rest, updatedAt: new Date() };
   if (imageUrl !== undefined) updateData.imageUrl = imageUrl || null;
   if (ingredients !== undefined) updateData.ingredients = JSON.stringify(ingredients);
   if (instructions !== undefined) updateData.instructions = JSON.stringify(instructions);
+  if (isFavorite !== undefined) updateData.isFavorite = isFavorite;
 
   const [updated] = await db
     .update(recipes)
